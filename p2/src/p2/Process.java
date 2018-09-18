@@ -1,5 +1,5 @@
 package p2;
-
+//jerry Garcia
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -12,7 +12,7 @@ public class Process {
     private float arrivalTime;
     private int priority;
     private float burstTime;
-    private int processNumber;
+    private int processNumber; //pid
     private float startTime;
     private float finishTime;
     private float expectedRunTime;
