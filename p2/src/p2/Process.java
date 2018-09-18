@@ -9,7 +9,7 @@ import java.util.Random;
 public class Process {
 
 //Variables
-    private float arrivalTime;
+    private float arrivalTime;  // hello
     private int priority;
     private float burstTime;
     private int processNumber; //pid
