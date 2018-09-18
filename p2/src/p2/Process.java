@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 
- //Process class will simulate different processes
+//Process class will simulate different processes
 
 public class Process {
 
@@ -12,7 +12,7 @@ public class Process {
     private float arrivalTime;
     private int priority;
     private float burstTime;
-    private int processNumber;
+    private int processNumber;	// pid
     private float startTime;
     private float finishTime;
     private float expectedRunTime;
