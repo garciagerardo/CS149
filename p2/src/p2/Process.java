@@ -12,11 +12,11 @@ public class Process {
     private float arrivalTime;  //test
     private int priority;
     private float burstTime;
-    private int processNumber; //pid
+    private int processID; //pid
     private float startTime;
     private float finishTime;
     private float expectedRunTime;
-    private final float expectedRunTimeForCal;
+    private final float expectedRunTimeForCal; //test comment
     private static Random randomGenerator = new Random(0);
     public final static int MAXIMUM_QUANTA_TIME = 99;
     public final static int MINIMUM_QUANTA_TIME = 0;
@@ -28,7 +28,7 @@ public class Process {
         expectedRunTime = generateRandomExpectedRunTime();
         expectedRunTimeForCal = expectedRunTime;
         priority = generateRandomPriority();
-        processNumber = aProcessNumber;
+        processID = aProcessNumber;
         startTime = -1;
         finishTime = -1;
         burstTime = expectedRunTime;
@@ -97,7 +97,7 @@ public class Process {
      //This returns process number of a Process.
     
     public int getProcessNumber() {
-        return processNumber;
+        return processID;
     }
 
      // Sets  start time of a Process
