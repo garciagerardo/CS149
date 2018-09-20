@@ -6,6 +6,7 @@ import java.util.Queue;
 import java.util.Collections;
 import java.util.Comparator;
 
+//test edit
 public class SJF {
 	// Fields
 	public String CPUStatus; // a string to represent the status of CPU at every quanta starting from 0 to 100.
