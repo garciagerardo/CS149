@@ -2,35 +2,45 @@ package p2;
 
 import java.util.*;
 
-public class SRTF {
+/**
+ * Shortest remaining time (SRT) is a preemptive scheduling algorithm that has a list
+ * of processes that are ready and running. If a job arrives and has a shorter
+ * time to complete than the remaining time on the current job, it immediately preempts
+ * the CPU.
+ */
+public class SRT {
     private final static int MAX_QUANTA_RUN_TIME = 100;
     private static int timeCounter = 0;
-    Queue<Process> queue;
-    ArrayList<Process> processes;
-    ArrayList<Process> readyProcesses;
     private String quantaScale;
     private String processesInformation;
     private float turnaroundTime;
     private float waitingTime;
     private float responseTime;
     private int processesCompleted;
+    Queue<Process> queue;
+    ArrayList<Process> processes;
+    ArrayList<Process> readyProcesses;
     
-    
-    public SRTF(ArrayList<Process> processes) {
+    /**
+     * Takes a list of processes and adds them to process queue
+     */
+    public SRT(ArrayList<Process> processes) {
+    	// process initialization
         this.processesInformation = "";
         this.quantaScale = "";
         this.processes = processes;
-        
        
-        //start sorting by arrival then expected time of Processes
+        // sort by arrival time then expected runtime
         Collections.sort(this.processes, new Comparator<Process>() {
             @Override
             public int compare(Process p1, Process p2) {
                 if (p1.getArrivalTime() < p2.getArrivalTime()) {
                     return -1;
-                } else if (p1.getArrivalTime() > p2.getArrivalTime()) {
+                }
+                else if (p1.getArrivalTime() > p2.getArrivalTime()) {
                     return 0;
-                } else {
+                }
+                else {
                     if (p1.getExpectedRunTime() > p2.getExpectedRunTime()) {
                         return 0;
                     }
@@ -39,15 +49,17 @@ public class SRTF {
             }
         });
         
-        //queue implemented by linked list
         queue = new LinkedList<Process>();
+        // add all the processes to process queue
         for (Process p : this.processes) {
             queue.add(p);
         }
     }
    
     
-    //returns process that's already with lowest burst time
+    /**
+     * Returns process that's already with lowest burst time
+     */
     public Process getReadyProcess() {
         Process current = null;
         int index = 0;

@@ -44,7 +44,7 @@ public class Tester {
           System.setOut(outToFile);
           for (int i = 1; i < 6; i++) {
               System.out.println("\n\n------- Now Running SRT: Test " + i + " ------");
-              SRTF srt = new SRTF(Process.generateProcesses(60));
+              SRT srt = new SRT(Process.generateProcesses(60));
               srt.run();
           }
       } catch (IOException a) {
