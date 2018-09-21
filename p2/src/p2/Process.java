@@ -34,6 +34,12 @@ public class Process {
         burstTime = expectedRunTime;
     }
 
+  //This generates a priority for random integer between 1 to 4.
+   
+    private int generateRandomPriority() {
+        return randomGenerator.nextInt(4) + 1;
+    }
+    
    //This is for random time between 0 to 99.
      
     private float generateRandomArrivalTime() {
@@ -45,14 +51,6 @@ public class Process {
     private float generateRandomExpectedRunTime() {
         return MINIMUM_TOTAL_RUN_TIME + (MAXIMUM_TOTAL_RUN_TIME - MINIMUM_TOTAL_RUN_TIME) * randomGenerator.nextFloat();
     }
-
-
-  //This generates a priority for random integer between 1 to 4.
-   
-    private int generateRandomPriority() {
-        return randomGenerator.nextInt(4) + 1;
-    }
-
    
  // This generates a list of processes
      
@@ -94,16 +92,16 @@ public class Process {
         return priority;
     }
 
-     //This returns process number of a Process.
-    
-    public int getProcessNumber() {
-        return processID;
-    }
-
      // Sets  start time of a Process
    
     public void setStartTime(float startTime){
         this.startTime = startTime;
+    }
+
+     //This returns process number of a Process.
+    
+    public int getProcessNumber() {
+        return processID;
     }
 
     // Returns start time of a Process
