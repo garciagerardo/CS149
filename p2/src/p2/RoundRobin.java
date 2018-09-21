@@ -7,31 +7,44 @@ import java.util.*;
 */
 public class RoundRobin {
 	private final static int MAX_QUANTA_RUN_TIME = 100;
-	private final static int TIME_SLICE = 1;
+	private final static int TIME_SLICE = 1;				//1 quantum
 	private static int timeCounter;
 	
 	private Queue<Process> queue;
-	private ArrayList<Process> processes;
+	private ArrayList<Process> allProcesses;
 	
 	private String quantaScale;
 	private String processesInformation;
 	
 	/**
-	 * Constructor for RR takes the incoming processes and sorts based on arrival time. 
-	 * @param processes - a list of randomly generated processes.
+	 * Constructor RR takes an incoming processes and sorts based on arrival time. 
+	 * @param allProcesses - a list of randomly generated processes.
 	 */
 	public RoundRobin(ArrayList<Process> someProcesses) {
 		processesInformation = "";
 		quantaScale = "";
-		processes = someProcesses;
-		Collections.sort(this.processes, new Comparator<Process>() {
+		allProcesses = someProcesses;
+//		Collections.sort(this.allProcesses, new Comparator<Process>() {
+//			public int compare(Process o1, Process o2) {
+//				return o1.getArrivalTime() < o2.getArrivalTime() ? -1 :
+//					 o1.getArrivalTime() > o2.getArrivalTime() ? 1: 0;
+//			}
+//		});
+		
+		Collections.sort(this.allProcesses, new Comparator<Process>() {
 			public int compare(Process o1, Process o2) {
-				return o1.getArrivalTime() < o2.getArrivalTime() ? -1 :
-					 o1.getArrivalTime() > o2.getArrivalTime() ? 1: 0;
+				if (o1.getArrivalTime() < o2.getArrivalTime()) {
+					return -1;
+				}
+				else if (o1.getArrivalTime() > o2.getArrivalTime()) {
+					return 1;
+				}
+				else return 0;
 			}
 		});
+		
 		queue = new LinkedList<Process>();
-		for(Process proc: this.processes){
+		for(Process proc: this.allProcesses){
 			
 			queue.add(proc);
 			this.processesInformation += this.printProcessesInfo(proc);
@@ -49,7 +62,7 @@ public class RoundRobin {
 		Queue<Process> readyQueue = new LinkedList<Process>();
 		while (!finish) {
 			// We use starve to kill any inactive processes in readyQueue and the boolean acts as a checker
-			starved = checkStarve(processes,readyQueue,timeCounter, MAX_QUANTA_RUN_TIME, starved);
+			starved = checkStarve(allProcesses,readyQueue,timeCounter, MAX_QUANTA_RUN_TIME, starved);
 			// If starved, we do not add the processes from queue to readyQueue because the current time is already over 100 quanta
 			if(!starved) {
 				// We are using a loop instead of poll because there can be more than 1 processes those have arrived i.e. 1.2, 1.3. 1.5 have arrived when current time is 2 
@@ -101,7 +114,7 @@ public class RoundRobin {
 		float totalTurnaroundTime = 0;
 		float totalWaitTime = 0;
 		float totalResponseTime = 0;
-		for(Process process: processes) {
+		for(Process process: allProcesses) {
 			totalTurnaroundTime += process.getFinishTime() - process.getArrivalTime();
 			totalWaitTime += (process.getFinishTime() - process.getArrivalTime()) - process.getExpectedRunTimeForCal();
 			totalResponseTime += process.getStartTime() - process.getArrivalTime();
@@ -111,12 +124,12 @@ public class RoundRobin {
 		float averageResponseTime = 0;
 		float throughput = 0;
 		
-		if(processes.size() > 0) {
-			averageTurnaroundTime = totalTurnaroundTime / processes.size();
-			averageWaitTime = totalWaitTime / processes.size();
-			averageResponseTime = totalResponseTime / processes.size();
+		if(allProcesses.size() > 0) {
+			averageTurnaroundTime = totalTurnaroundTime / allProcesses.size();
+			averageWaitTime = totalWaitTime / allProcesses.size();
+			averageResponseTime = totalResponseTime / allProcesses.size();
 			if(timeCounter > 0)
-				throughput = (float)processes.size() / timeCounter;
+				throughput = (float)allProcesses.size() / timeCounter;
 		}
 		
 		System.out.println("Average turnaround time = " + averageTurnaroundTime);
