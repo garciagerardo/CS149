@@ -6,6 +6,10 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.Queue;
 
+/**
+ * Shortest job first
+ *
+ */
 public class SJF {
 	public final static int MAX_QUANTA_RUN_TIME = 100;
 	public static int timeCounter = 0;
