@@ -45,7 +45,7 @@ public class FCFS {
 		// counter (using quanta as scale)
 		timeCounter = 0;
 		boolean isRunning = false; // is there a processes currently running? default set to false
-		Process current = null; // temp var
+		Process currentProcess = null; // temp var
 		double nextAvailability = 0.0; // var to keep track of whether a process is running
 		for (; timeCounter < MAX_QUANTA_RUN_TIME; timeCounter++)
 		{
@@ -53,34 +53,34 @@ public class FCFS {
 			{
 				// If the timeCounter is greater than or equal to nextAvailability, then the current process is done
 				isRunning = false;
-				if (current != null) {
-					this.infoForProcess += this.printProcess(current);
-					current = null;
+				if (currentProcess != null) {
+					this.infoForProcess += this.printProcess(currentProcess);
+					currentProcess = null;
 					this.processDone++;
 				}
 			}
 			// checks if the CPU is idle and if there are any processes in the queue
 			if (!processQueue.isEmpty() && processQueue.peek().getArrivalTime() <= timeCounter && !isRunning)
 			{
-				current = processQueue.poll();
+				currentProcess = processQueue.poll();
 				isRunning = true;
 				// expectedRunTime = when the current process is expected to complete its run
-				nextAvailability = timeCounter + current.getExpectedRunTime();
-				this.CPUStatus += timeCounter + ": Process " + current.getProcessNumber() +"\n";
+				nextAvailability = timeCounter + currentProcess.getExpectedRunTime();
+				this.CPUStatus += timeCounter + ": Process " + currentProcess.getProcessNumber() +"\n";
 
 				// time from process start to finish
-				this.turnAroundTime += nextAvailability - current.getArrivalTime();
+				this.turnAroundTime += nextAvailability - currentProcess.getArrivalTime();
 				// time in queue
-				this.waitTime += timeCounter - (current.getArrivalTime() + current.getExpectedRunTime());
+				this.waitTime += timeCounter - (currentProcess.getArrivalTime() + currentProcess.getExpectedRunTime());
 				// time from process arrival until start
-				this.responseTime += timeCounter - current.getArrivalTime();
+				this.responseTime += timeCounter - currentProcess.getArrivalTime();
 			}
 			else
 			{
-				if (current != null) // if CPU is busy,
+				if (currentProcess != null) // if CPU is busy,
 				{
 					// add process number
-					this.CPUStatus += timeCounter + ": Process " + current.getProcessNumber() +  "\n";
+					this.CPUStatus += timeCounter + ": Process " + currentProcess.getProcessNumber() +  "\n";
 				}
 				else // if CPU is idle,
 				{
@@ -95,10 +95,10 @@ public class FCFS {
 		{
 			this.processDone++;
 			for (; timeCounter < Math.round(nextAvailability); timeCounter++) {
-				this.CPUStatus += timeCounter + ": Process " + current.getProcessNumber() +  "\n";
+				this.CPUStatus += timeCounter + ": Process " + currentProcess.getProcessNumber() +  "\n";
 				this.responseTime += timeCounter;
 			}
-			this.infoForProcess += this.printProcess(current);
+			this.infoForProcess += this.printProcess(currentProcess);
 		}
 		
 		// print output to txt file about processes
