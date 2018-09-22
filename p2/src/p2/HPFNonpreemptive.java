@@ -9,104 +9,102 @@ import java.lang.*;
  */
 public class HPFNonpreemptive {
 
-	public HPFNonpreemptive(ArrayList<Process> someProcesses) {
-		processesInformation = "";
-		quantaScale = "";
-		processes = someProcesses;
+	private final static int MAX_QUANTA_RUN_TIME = 100;
+	private static int counter = 0;
+	private Queue<Process> queue;
+	private ArrayList<Process> processes;
+	private String scaleOfQuanta;
+	private String infoOfProcess;
+	private float turnaroundTime;
+	private float waitTime;
+	private float response;
+	private int completedProcesses;
+	
+	public HPFNonpreemptive(ArrayList<Process> myProcess) {
+		infoOfProcess = "";
+		scaleOfQuanta = "";
+		processes = myProcess;
 
-		//HPf comparator
-		//compares by arrival, then by priority since it is non premptive
+		//HPF comparator first compares by arrival and then by priority
 		Collections.sort(processes, new Comparator<Process>() {
-			public int compare(Process p1, Process p2) {
-				if (p1.getPriority() == p2.getPriority()) 
-					return Float.compare(p1.getArrivalTime(), p2.getArrivalTime());
+			public int compare(Process process1, Process process2) {
+				if (process1.getPriority() == process2.getPriority()) 
+					return Float.compare(process1.getArrivalTime(), process2.getArrivalTime());
 				else
-					return Integer.compare(p1.getPriority(), p2.getPriority());
+					return Integer.compare(process1.getPriority(), process2.getPriority());
 			}
 		});
 		queue = new LinkedList<Process>();
-		for (Process proc : this.processes) {
-			queue.add(proc);
+		for (Process process : this.processes) {
+			queue.add(process);
 		}
 	}
 
-	/**
-	 * Method to run this HPF algorithm
-	 */
-	public void run() {
-		timeCounter = 0;
-		boolean isProcessRunning = false;
-		Process current = null;
-		float nextAvailability = 0;
-		for (; timeCounter < MAX_QUANTA_RUN_TIME; timeCounter++) {
-			/*
-			 * check for processes to add to queue, if current process empty
-			 * add to queue
-			 * execute process once there is a current process
-			 */
-			if (nextAvailability <= timeCounter) {
-				isProcessRunning = false;
-				if (current != null) {
-					this.processesInformation += this.printProcessesInfo(current);
-					current = null;
-					this.processesCompleted++;
-				}
-			}
-			if (!queue.isEmpty() && queue.peek().getArrivalTime() <= timeCounter && !isProcessRunning) {
-				current = queue.poll();
-				isProcessRunning = true;
-				nextAvailability = timeCounter + current.getExpectedRunTime();
-				this.quantaScale += timeCounter + ": " + current.getProcessNumber() + "\n";
-
-				this.turnaroundTime += nextAvailability - current.getArrivalTime();
-				this.waitingTime += (nextAvailability - current.getArrivalTime()) - current.getExpectedRunTime();
-				this.responseTime += timeCounter;
-
-			} else {
-				if (current != null) {
-					this.quantaScale += timeCounter + ": " + current.getProcessNumber() + "\n";
-				} else {
-					this.quantaScale += timeCounter + ": Waiting for a process\n";
-				}
-
-			}
-		}
-
-		if (isProcessRunning) {
-			for (int i = MAX_QUANTA_RUN_TIME; i < Math.round(nextAvailability); i++) {
-				this.quantaScale += i + ": " + current.getProcessNumber() + "\n";
-			}
-			this.processesInformation += this.printProcessesInfo(current);
-		}
-		System.out.println(this.processesInformation);
-		System.out.println(this.quantaScale);
-		System.out.println("\n turnaroundtime: " + this.turnaroundTime / this.processesCompleted);
-		System.out.println(" avg waiting time: " + this.waitingTime / this.processesCompleted);
-		System.out.println("avg response time: " + this.responseTime / this.processesCompleted);
-		System.out.println("throughput: " + this.processesCompleted / (float) timeCounter);
-	}
-
-	
 	private String printProcessesInfo(Process currentProcess) {
-		int processNumber = currentProcess.getProcessNumber();
-		float arrivalTime = currentProcess.getArrivalTime();
+		int processNum = currentProcess.getProcessNumber();
+		float timeOfArrival = currentProcess.getArrivalTime();
 		float runTime = currentProcess.getExpectedRunTime();
 		int priority = currentProcess.getPriority();
 
-		String processInfo = "\n" + "Process " + processNumber + " \n" + "Arrival Time of this process is: "
-				+ arrivalTime + " \n" + "Expected Run Time is: " + runTime + " \n" + "Priority " + priority + "\n";
+		String processInfo = "\n" + "Process " + processNum + " \n" + "Arrival Time of this process is: "
+				+ timeOfArrival + " \n" + "Expected Run Time is: " + runTime + " \n" + "Priority " + priority + "\n";
 
 		return processInfo;
 	}
+	/**
+	 * HPF algorithm run method
+	 */
+	public void run() {
+		counter = 0;
+		boolean isRunning = false;
+		Process current = null;
+		float nextAvailability = 0;
+		for (; counter < MAX_QUANTA_RUN_TIME; counter++) {
+			/*
+			 * if current process empty add to queue
+			 * if there is a current process execute process 
+			 */
+			if (nextAvailability <= counter) {
+				isRunning = false;
+				if (current != null) {
+					this.infoOfProcess += this.printProcessesInfo(current);
+					current = null;
+					this.completedProcesses++;
+				}
+			}
+			if (!queue.isEmpty() && queue.peek().getArrivalTime() <= counter && !isRunning) {
+				current = queue.poll();
+				isRunning = true;
+				nextAvailability = counter + current.getExpectedRunTime();
+				this.scaleOfQuanta += counter + ": " + current.getProcessNumber() + "\n";
 
-	private final static int MAX_QUANTA_RUN_TIME = 100;
-	private static int timeCounter = 0;
-	private Queue<Process> queue;
-	private ArrayList<Process> processes;
-	private String quantaScale;
-	private String processesInformation;
-	private float turnaroundTime;
-	private float waitingTime;
-	private float responseTime;
-	private int processesCompleted;
+				this.turnaroundTime += nextAvailability - current.getArrivalTime();
+				this.waitTime += (nextAvailability - current.getArrivalTime()) - current.getExpectedRunTime();
+				this.response += counter;
+
+			} else {
+				if (current != null) {
+					this.scaleOfQuanta += counter + ": " + current.getProcessNumber() + "\n";
+				} else {
+					this.scaleOfQuanta += counter + ": Waiting for a process\n";
+				}
+
+			}
+		}
+
+		if (isRunning) {
+			for (int i = MAX_QUANTA_RUN_TIME; i < Math.round(nextAvailability); i++) {
+				this.scaleOfQuanta += i + ": " + current.getProcessNumber() + "\n";
+			}
+			this.infoOfProcess += this.printProcessesInfo(current);
+		}
+		System.out.println(this.infoOfProcess);
+		System.out.println(this.scaleOfQuanta);
+		System.out.println("\n turnaroundtime: " + this.turnaroundTime / this.completedProcesses);
+		System.out.println(" avg waiting time: " + this.waitTime / this.completedProcesses);
+		System.out.println("avg response time: " + this.response / this.completedProcesses);
+		System.out.println("throughput: " + this.completedProcesses / (float) counter);
+	}
+
+	
 }
