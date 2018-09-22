@@ -1,28 +1,32 @@
 package p2;
 
 import java.io.*;
-//This will test and then output the algorithms to a text file 
+
+// Tests each algorithm; outputs the statistics of each algorithm's run to the respective text file 
 
 public class Tester {
-	
+
 	public static void main(String[] args) {
-		
-		testsRR();
+
+		rrTester();
 		Process.resetRandomGenerator();
-		testsHPFNonPre();
+		hpfNonPreTester();
 		Process.resetRandomGenerator();
-		testsHPFPre();
+		hpfPreTester();
 		Process.resetRandomGenerator();
-		testsFCFC();
+		fcfsTester();
 		Process.resetRandomGenerator();
-		testsSJF();
+		sjfTester();
 		Process.resetRandomGenerator();
-		testsSRTF();
+		srtTester();
 		Process.resetRandomGenerator();
-		
+
 	}
-	
-	public static void testsFCFC() {
+
+	/**
+	 * Runs the FCFS algorithm; outputs statistics to FCFS_OUT.txt file
+	 */
+	public static void fcfsTester() {
 		try {
 			PrintStream outToFile = new PrintStream("FCFS_OUT.txt");
 			System.setOut(outToFile);
@@ -35,41 +39,11 @@ public class Tester {
 			System.out.println("\n\n ----- Error running FCFS ----- " + "\n" + a);
 		}
 	}
-
-	//This will test SRT and output to the SRT.txt
-  public static void testsSRTF() {
-      try {
-          PrintStream outToFile = new PrintStream("SRT_OUT.txt");
-          System.setOut(outToFile);
-          for (int i = 1; i < 6; i++) {
-              System.out.println("\n\n------- Now Running SRT: Test " + i + " ------");
-              SRT srt = new SRT(Process.generateProcesses(60));
-              srt.run();
-          }
-      } catch (IOException a) {
-          System.out.println("\n\n------ Error running SRT------- " + "\n" + a);
-      }
-  }
-  
-//This will test SJF and output to the SJF_OUT.txt
-	public static void testsSJF() {
-		try {
-			PrintStream outToFile = new PrintStream("SJF_OUT.txt");
-			System.setOut(outToFile);
-			for (int i = 1; i < 6; i++) {
-				System.out.println("\n\n------ Now Running Shortest Job First: Test " + i + " ------");
-				SJF sjf = new SJF(Process.generateProcesses(60));
-				sjf.run();
-			}
-		} catch (IOException a) {
-			System.out.println("\n\n ----- Error running SJF ----- " + "\n" + a);
-		}
-	}
 	
-	
-	
-	// This will test HPF Nonpreemptive and output to the HPF-NONPRE_OUT.txt
-	public static void testsHPFNonPre() {
+	/**
+	 * Runs the HPF Nonpreemptive algorithm; outputs statistics to HPF-NONPRE_OUT.txt file
+	 */
+	public static void hpfNonPreTester() {
 		try {
 			PrintStream outToFile = new PrintStream("HPF-NONPRE_OUT.txt");
 			System.setOut(outToFile);
@@ -82,9 +56,11 @@ public class Tester {
 			System.out.println("\n\n ---- Error running HPF-NONPRE ------ " + "\n" + a);
 		}
 	}
-	
-	//This will test HPF Preemptive and output to the HPF-PRE_OUT.txt
-	public static void testsHPFPre() {
+
+	/**
+	 * Runs the HPF Preemptive algorithm; outputs statistics to HPF-PRE_OUT.txt file
+	 */
+	public static void hpfPreTester() {
 		try {
 			PrintStream outToFile = new PrintStream("HPF-PRE_OUT.txt");
 			System.setOut(outToFile);
@@ -97,9 +73,45 @@ public class Tester {
 			System.out.println("\n\n ------ Error running HPF-PRE ------ " + "\n" + a);
 		}
 	}
-	
-	//This will test RR and output to the RR_OUT.txt
-	public static void testsRR() {
+
+	/**
+	 * Runs the SRT algorithm; outputs statistics to SRT_OUT.txt file
+	 */
+	public static void srtTester() {
+		try {
+			PrintStream outToFile = new PrintStream("SRT_OUT.txt");
+			System.setOut(outToFile);
+			for (int i = 1; i < 6; i++) {
+				System.out.println("\n\n------- Now Running SRT: Test " + i + " ------");
+				SRT srt = new SRT(Process.generateProcesses(60));
+				srt.run();
+			}
+		} catch (IOException a) {
+			System.out.println("\n\n------ Error running SRT------- " + "\n" + a);
+		}
+	}
+
+	/**
+	 * Runs the SJF algorithm; outputs statistics to SJF_OUT.txt file
+	 */
+	public static void sjfTester() {
+		try {
+			PrintStream outToFile = new PrintStream("SJF_OUT.txt");
+			System.setOut(outToFile);
+			for (int i = 1; i < 6; i++) {
+				System.out.println("\n\n------ Now Running Shortest Job First: Test " + i + " ------");
+				SJF sjf = new SJF(Process.generateProcesses(60));
+				sjf.run();
+			}
+		} catch (IOException a) {
+			System.out.println("\n\n ----- Error running SJF ----- " + "\n" + a);
+		}
+	}
+
+	/**
+	 * Runs the RR algorithm; outputs statistics to RR_OUT.txt file
+	 */
+	public static void rrTester() {
 		try {
 			PrintStream outToFile = new PrintStream("RR_OUT.txt");
 			System.setOut(outToFile);
@@ -113,5 +125,6 @@ public class Tester {
 			}
 		} catch (IOException a) {
 			System.out.println("\n\n ------ Error running RR ------- " + "\n" + a);
-		}}
+		}
+	}
 }
