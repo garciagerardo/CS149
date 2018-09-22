@@ -9,25 +9,22 @@ import java.util.*;
  * the CPU.
  */
 public class SRT {
+	/*** Instance variables ***/
     private final static int MAX_QUANTA_RUN_TIME = 100;
-    private static int timeCounter = 0;
-    private String quantaScale;
-    private String processesInformation;
+    private int processesCompleted;
+    private Queue<Process> queue;
+    private ArrayList<Process> processes;
+    private ArrayList<Process> readyProcesses;
+    // statistics for averages
     private float turnaroundTime;
     private float waitingTime;
     private float responseTime;
-    private int processesCompleted;
-    Queue<Process> queue;
-    ArrayList<Process> processes;
-    ArrayList<Process> readyProcesses;
+    /***********************/
     
     /**
      * Takes a list of processes and adds them to process queue
      */
     public SRT(ArrayList<Process> processes) {
-    	// process initialization
-        this.processesInformation = "";
-        this.quantaScale = "";
         this.processes = processes;
        
         // sort by arrival time then expected runtime
@@ -58,9 +55,9 @@ public class SRT {
    
     
     /**
-     * Returns process that's already with lowest burst time
+     * Returns a process from the ready queue with the lowest burst time
      */
-    public Process getReadyProcess() {
+    public Process getProcessRQ() {
         Process current = null;
         int index = 0;
         for (int i = 0; i < readyProcesses.size(); i++) {
@@ -81,38 +78,38 @@ public class SRT {
                 + " \nPriority " + currProcess.getPriority() + "\n";
     }
 
-     public void run() {
-        //current process
+    /**
+     * Run the SRT algorithm and output statistics
+     */
+    public void run() {
+    	// current process
         Process current = null;
-        //readyProcesses: ready and waiting processes
+        // readyProcesses: ready and waiting processes
         readyProcesses = new ArrayList<Process>();
-        String timeline = "";
-        //expected values print
+        String processHistory = "";
+        // expected values print
         for (int i = 0; i < processes.size(); i++) {
-            System.out.println("Process " + processes.get(i).getProcessNumber());
-            System.out.println("Arrival Time of this process is: " + processes.get(i).getArrivalTime());
-            System.out.println("Expected Run Time is: " + processes.get(i).getExpectedRunTime());
+            System.out.println("Process #" + processes.get(i).getProcessNumber());
             System.out.println("Priority: " + processes.get(i).getPriority() + "\n");
-            
+            System.out.println("Arrival Time: " + processes.get(i).getArrivalTime());
+            System.out.println("Expected Runtime: " + processes.get(i).getExpectedRunTime());
         }
-        //processing system
+        // processing system
         for (int t = 0; t <= 100; t++) {
             System.out.println("Time: " + t);
             
-            
-            //checks for null pointer and checks if everyone's arrived
+            // checks for null pointer and checks if everyone's arrived
             if (!queue.isEmpty()) { 
             		//if current is null and process has arrived
                 if (current == null & queue.peek().getArrivalTime() <= t) {
-                		//current is the arrived from the queue list
+                	//current is the arrived from the queue list
                     current = queue.poll();
                     current.setStartTime(t);
-                
                 //if current is not null check who's arrived
-                } else if ((queue.peek().getArrivalTime() <= t)) {
-                		//checks that current is replaced and how lower burst time
-                    if (current.getBurstTime() > queue.peek().getBurstTime())
-                    {
+                }
+                else if ((queue.peek().getArrivalTime() <= t)) {
+                	//checks that current is replaced and how lower burst time
+                    if (current.getBurstTime() > queue.peek().getBurstTime()) {
                         //add current to readyProcesses that is waiting
                         readyProcesses.add(current);
                         //set current as running process
@@ -120,33 +117,28 @@ public class SRT {
                         current.setStartTime(t);
                     }
                     // if the older one has a lower burst time 
-                    else if (current.getBurstTime() <= queue.peek().getBurstTime())
-                    {
+                    else if (current.getBurstTime() <= queue.peek().getBurstTime()) {
                     		//new process added to readyProcesses that is waiting
                         readyProcesses.add(queue.poll());
                     }
-                    
                 }
             }
-            if(current == null)
-            {
-                timeline = timeline + "NAN ";
+            if (current == null) {
+                processHistory = processHistory + "NULL ";
             }
-            else
-            {
-                timeline = timeline + current.getProcessNumber() + " ";
+            else {
+                processHistory = processHistory + current.getProcessNumber() + " ";
             }
             //decrement only if it's not null
             if (current != null) {
-                System.out.println("----Process #" + current.getProcessNumber() +"------");
-                current.decBurstTime();//decrement process
+                System.out.println("Process #" + current.getProcessNumber());
+                current.decBurstTime();
                 
-                //when burst time is 0 the process is done
+                // gather process information after it is finished (when burst time = 0)
                 if (current.getBurstTime() == 0) {
                     this.turnaroundTime += (t + 1) - current.getArrivalTime();
                     
                     this.waitingTime += ((t + 1) - current.getArrivalTime()) - (current.getExpectedRunTime());               
-                    
                     
                     this.responseTime += current.getStartTime() - current.getArrivalTime();
                     
@@ -155,22 +147,23 @@ public class SRT {
                     if (readyProcesses.size() == 0) {
                         current = null; //no one is waiting. current is null
                         
-                    } else {
-                    		//process is waiting. get process with lowest burst time
-                        current = getReadyProcess();
+                    }
+                    else {
+                    	//process is waiting. get process with lowest burst time
+                        current = getProcessRQ();
                         //process never ran and is in queue
-                        if(current.getBurstTime() == current.getExpectedRunTime())
-                        {
+                        if(current.getBurstTime() == current.getExpectedRunTime()) {
                             current.setStartTime(t);
                         }
                     }
-                }
-                                
+                }         
             }
         }
-        System.out.println(timeline);
-        System.out.println("\nThe average turnaround time is: " + this.turnaroundTime / this.processesCompleted);
-        System.out.println("The average waiting time is: " + this.waitingTime / this.processesCompleted);
-        System.out.println("The average response time is: " + this.responseTime / this.processesCompleted);
+
+        System.out.println(processHistory);
+        System.out.println("\nAverage turnaround time: " + this.turnaroundTime / this.processesCompleted);
+        System.out.println("Average wait time: " + this.waitingTime / this.processesCompleted);
+        System.out.println("Average response time: " + this.responseTime / this.processesCompleted);
     }
-}
+
+} // end of class SRT

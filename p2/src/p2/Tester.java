@@ -22,7 +22,6 @@ public class Tester {
 		
 	}
 	
-	
 	public static void testsFCFC() {
 		try {
 			PrintStream outToFile = new PrintStream("FCFS_OUT.txt");
@@ -99,21 +98,20 @@ public class Tester {
 		}
 	}
 	
-
-
-//This will test RR and output to the RR_OUT.txt
-public static void testsRR() {
-	try {
-		PrintStream outToFile = new PrintStream("RR_OUT.txt");
-		System.setOut(outToFile);
-		for (int i = 1; i < 6; i++) {
-			System.out.println("------- Now Running RR: Test " + i + " ------");
-			RoundRobin rr = new RoundRobin(Process.generateProcesses(60));
-			rr.run();
-			System.out.println();
-			rr.calculateStats();
-			System.out.println();
-		}
-	} catch (IOException a) {
-		System.out.println("\n\n ------ Error running RR ------- " + "\n" + a);
-	}}}
+	//This will test RR and output to the RR_OUT.txt
+	public static void testsRR() {
+		try {
+			PrintStream outToFile = new PrintStream("RR_OUT.txt");
+			System.setOut(outToFile);
+			for (int i = 1; i < 6; i++) {
+				System.out.println("------- Now Running RR: Test " + i + " ------");
+				RoundRobin rr = new RoundRobin(Process.generateProcesses(60));
+				rr.run();
+				System.out.println();
+				rr.calculateStats();
+				System.out.println();
+			}
+		} catch (IOException a) {
+			System.out.println("\n\n ------ Error running RR ------- " + "\n" + a);
+		}}
+}
