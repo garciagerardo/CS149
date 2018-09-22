@@ -8,15 +8,15 @@ import java.util.Collections;
 public class FCFS {
 	// Fields
 	public String CPUStatus; // a string to represent the status of CPU at every quanta starting from 0 to 100.
-	public String infoForProcess;
-	public final static int MAX_QUANTA_RUN_TIME = 100;
-	public static int timeCounter = 0; // a counter to keep track of time (from 0 to MAX_QUANTA_RUN_TIME)
 	public Queue<Process> processQueue;
 	public ArrayList<Process> processes;
+	public String infoForProcess;
+	public static int timeCounter = 0; // a counter to keep track of time (from 0 to MAX_QUANTA_RUN_TIME)
 	public double responseTime;
-	public int processDone;
 	public double turnAroundTime;
 	public double waitTime;
+	public int processDone;
+	public final static int MAX_QUANTA_RUN_TIME = 100;
 
 
 	// constructor that sorts processes according to when they are started, using Collections.sort()
