@@ -11,10 +11,10 @@ import java.util.*;
 public class SRT {
 	/*** Instance variables ***/
     private final static int MAX_QUANTA_RUN_TIME = 100;
-    private int processesCompleted;
+    private int completed;					// number of completed processes
     private Queue<Process> queue;
     private ArrayList<Process> processes;
-    private ArrayList<Process> readyProcesses;
+    private ArrayList<Process> ready;
     // statistics for averages
     private float turnaroundTime;
     private float waitingTime;
@@ -22,12 +22,11 @@ public class SRT {
     /***********************/
     
     /**
-     * Takes a list of processes and adds them to process queue
+     * Takes a list of processes, sorts by expected runtime, and adds them to process queue
      */
     public SRT(ArrayList<Process> processes) {
         this.processes = processes;
-       
-        // sort by arrival time then expected runtime
+        // sort by expected runtime
         Collections.sort(this.processes, new Comparator<Process>() {
             @Override
             public int compare(Process p1, Process p2) {
@@ -46,8 +45,8 @@ public class SRT {
             }
         });
         
-        queue = new LinkedList<Process>();
         // add all the processes to process queue
+        queue = new LinkedList<Process>();
         for (Process p : this.processes) {
             queue.add(p);
         }
@@ -60,16 +59,16 @@ public class SRT {
     public Process getProcessRQ() {
         Process current = null;
         int index = 0;
-        for (int i = 0; i < readyProcesses.size(); i++) {
+        for (int i = 0; i < ready.size(); i++) {
             if (current == null) {
-                current = readyProcesses.get(i);
+                current = ready.get(i);
                 index = i;
-            } else if (current.getBurstTime() > readyProcesses.get(i).getBurstTime()) {
-                current = readyProcesses.get(i);
+            } else if (current.getBurstTime() > ready.get(i).getBurstTime()) {
+                current = ready.get(i);
                 index = i;
             }
         }
-        readyProcesses.remove(index);
+        ready.remove(index);
         return current;
     }
     public String printProcessesInfo(Process currProcess) {
@@ -84,8 +83,8 @@ public class SRT {
     public void run() {
     	// current process
         Process current = null;
-        // readyProcesses: ready and waiting processes
-        readyProcesses = new ArrayList<Process>();
+        // ready: ready and waiting processes
+        ready = new ArrayList<Process>();
         String processHistory = "";
         // expected values print
         for (int i = 0; i < processes.size(); i++) {
@@ -110,16 +109,16 @@ public class SRT {
                 else if ((queue.peek().getArrivalTime() <= t)) {
                 	//checks that current is replaced and how lower burst time
                     if (current.getBurstTime() > queue.peek().getBurstTime()) {
-                        //add current to readyProcesses that is waiting
-                        readyProcesses.add(current);
+                        //add current to ready that is waiting
+                        ready.add(current);
                         //set current as running process
                         current = queue.poll();
                         current.setStartTime(t);
                     }
                     // if the older one has a lower burst time 
                     else if (current.getBurstTime() <= queue.peek().getBurstTime()) {
-                    		//new process added to readyProcesses that is waiting
-                        readyProcesses.add(queue.poll());
+                    		//new process added to ready that is waiting
+                        ready.add(queue.poll());
                     }
                 }
             }
@@ -129,7 +128,7 @@ public class SRT {
             else {
                 processHistory = processHistory + current.getProcessNumber() + " ";
             }
-            //decrement only if it's not null
+            // if there is a current process, decrement process burst time
             if (current != null) {
                 System.out.println("Process #" + current.getProcessNumber());
                 current.decBurstTime();
@@ -137,33 +136,29 @@ public class SRT {
                 // gather process information after it is finished (when burst time = 0)
                 if (current.getBurstTime() == 0) {
                     this.turnaroundTime += (t + 1) - current.getArrivalTime();
-                    
                     this.waitingTime += ((t + 1) - current.getArrivalTime()) - (current.getExpectedRunTime());               
-                    
                     this.responseTime += current.getStartTime() - current.getArrivalTime();
-                    
-                    this.processesCompleted++;
-                    //check arrived has anybody waiting
-                    if (readyProcesses.size() == 0) {
-                        current = null; //no one is waiting. current is null
+                    this.completed++;
+                    // if ready queue has 0, there are no current processes
+                    if (ready.size() == 0) {
+                        current = null;
                         
                     }
                     else {
-                    	//process is waiting. get process with lowest burst time
+                    	// get process from ready queue and set start time
                         current = getProcessRQ();
-                        //process never ran and is in queue
                         if(current.getBurstTime() == current.getExpectedRunTime()) {
                             current.setStartTime(t);
                         }
                     }
-                }         
+                }
             }
-        }
+        }	// end of run()
 
         System.out.println(processHistory);
-        System.out.println("\nAverage turnaround time: " + this.turnaroundTime / this.processesCompleted);
-        System.out.println("Average wait time: " + this.waitingTime / this.processesCompleted);
-        System.out.println("Average response time: " + this.responseTime / this.processesCompleted);
+        System.out.println("\nAverage turnaround time: " + this.turnaroundTime / this.completed);
+        System.out.println("Average wait time: " + this.waitingTime / this.completed);
+        System.out.println("Average response time: " + this.responseTime / this.completed);
     }
 
 } // end of class SRT
