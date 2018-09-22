@@ -7,27 +7,30 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 /**
- * Shortest job first
- *
+ * Shortest job first (SJF) is a non-preemptive scheduling algorithm that
+ * schedules processes to be ran in order of shortest completion time first.
  */
 public class SJF {
-	public final static int MAX_QUANTA_RUN_TIME = 100;
-	public static int timeCounter = 0;
-	public String CPUStatus; // a string to represent the status of CPU at every quanta starting from 0 to 100.
-	public String infoForProcess;
-	public Queue<Process> processQueue;
-	public ArrayList<Process> processes;
-	public double responseTime;
-	public double turnAroundTime;
-	public double waitTime;
-	public int processDone;
+	/*** Instance variables ***/
+	private final static int MAX_QUANTA_RUN_TIME = 100;
+	private static int totalTime = 0;
+	private String status;					// CPU status
+	private String processInfo;				// process statistics
+	private int finished;					// number of finished processes
+	private Queue<Process> processQueue;
+	private ArrayList<Process> processes;
+	// statistics for averages
+	private float responseTime;
+	private float turnAroundTime;
+	private float waitTime;
+	/***********************/
 
 	/**
 	 * Sorts the processes according to start time
 	 */
 	public SJF(ArrayList<Process> processes) {
-		this.infoForProcess = "";
-		this.CPUStatus = "";
+		this.processInfo = "";
+		this.status = "";
 		this.processes = processes;
 		Collections.sort(this.processes, (o1, o2) -> o1.getArrivalTime() < o2.getArrivalTime() ? -1 :
              o1.getArrivalTime() > o2.getArrivalTime() ? 1:
@@ -91,67 +94,67 @@ public class SJF {
 	}
 	
 	/**
-	 * Starts SJF algorithm
+	 * Starts SJF algorithm and output statistics
 	 */
 	public void run() {
-		timeCounter = 0;
+		totalTime = 0;
 		boolean isRunning = false;	// default: there is no process currently running
-		Process current = null; // temp var
+		Process current = null;
 		double nextAvailability = 0.0; // var to keep track of whether a process is running
-		for (; timeCounter < MAX_QUANTA_RUN_TIME; timeCounter++) {
-			if (nextAvailability <= timeCounter) {
-				// If the timeCounter is greater than or equal to nextAvailability, then the current process is done
+		for (; totalTime < MAX_QUANTA_RUN_TIME; totalTime++) {
+			if (nextAvailability <= totalTime) {
+				// If the totalTime is greater than or equal to nextAvailability, then the current process is done
 				isRunning = false;
 				if (current != null) {
-					this.infoForProcess += this.printProcess(current);
+					this.processInfo += this.printProcess(current);
 					current = null;
-					this.processDone++;
+					this.finished++;
 				}
 			}
 
 			// checks if the CPU is idle and if there are any processes in the queue
-			if (!processQueue.isEmpty() && processQueue.peek().getArrivalTime() <= timeCounter && !isRunning) {
+			if (!processQueue.isEmpty() && processQueue.peek().getArrivalTime() <= totalTime && !isRunning) {
 				current = processQueue.poll();
 				isRunning = true;
 				// expectedRunTime = when the current process is expected to complete its run
-				nextAvailability = timeCounter + current.getExpectedRunTime();
-				this.CPUStatus += timeCounter + ": Process " + current.getProcessNumber() + "\n";
+				nextAvailability = totalTime + current.getExpectedRunTime();
+				this.status += totalTime + ": Process " + current.getProcessNumber() + "\n";
 
 				// time from process start to finish
 				this.turnAroundTime += nextAvailability - current.getArrivalTime();
 				// time in queue
-				this.waitTime += timeCounter - (current.getArrivalTime() + current.getExpectedRunTime());
+				this.waitTime += totalTime - (current.getArrivalTime() + current.getExpectedRunTime());
 				// time from process arrival until start
-				this.responseTime += timeCounter - current.getArrivalTime();
+				this.responseTime += totalTime - current.getArrivalTime();
 
 			}
 			else {
 				// if the CPU is busy, add the process number
 				if (current != null) {
-					this.CPUStatus += timeCounter + ": Process " + current.getProcessNumber() + "\n";
+					this.status += totalTime + ": Process " + current.getProcessNumber() + "\n";
 				}
 				// else if the CPU is idle, wait for the process to run
 				else {
-					this.CPUStatus += timeCounter + ": Waiting for a process\n";
+					this.status += totalTime + ": Waiting for a process\n";
 				}
 			}
 
 			// if the process is still running, add to the number of finished processes
 			if (isRunning) {
-				this.processDone++;
-				for (; timeCounter < Math.round(nextAvailability); timeCounter++) {
-					this.CPUStatus += timeCounter + ": Process " + current.getProcessNumber() + "\n";
-					this.responseTime += timeCounter;
+				this.finished++;
+				for (; totalTime < Math.round(nextAvailability); totalTime++) {
+					this.status += totalTime + ": Process " + current.getProcessNumber() + "\n";
+					this.responseTime += totalTime;
 				}
-				this.infoForProcess += this.printProcess(current);
+				this.processInfo += this.printProcess(current);
 			}
 
-			System.out.println(this.infoForProcess);
-			System.out.println(this.CPUStatus);
-			System.out.println("\nAverage Turn-Around time: " + this.turnAroundTime / this.processDone);
-			System.out.println("Average Wait time: " + this.waitTime / this.processDone);
-			System.out.println("Average Response time: " + this.responseTime / this.processDone);
-			System.out.println("Throughput: " + this.processDone / (float) timeCounter);
+			System.out.println(this.processInfo);
+			System.out.println(this.status);
+			System.out.println("\nAverage Turnaround time: " + this.turnAroundTime / this.finished);
+			System.out.println("Average wait time: " + this.waitTime / this.finished);
+			System.out.println("Average response time: " + this.responseTime / this.finished);
+			System.out.println("Throughput: " + this.finished / (float) totalTime);
 		}
 	}
 	
@@ -159,10 +162,10 @@ public class SJF {
 	 *  Prints the process times and priority
 	 */
 	private String printProcess(Process currProcess) {
-		return "\nProcess " + currProcess.getProcessNumber() +
-				" \nArrival time of current process: " + currProcess.getArrivalTime() +
-				" \nRun time of current process: " + currProcess.getExpectedRunTime() +
-				" \nPriority of current process: " + currProcess.getPriority() + "\n";
+		return "\nProcess #" + currProcess.getProcessNumber() +
+				" \nPriority: " + currProcess.getPriority() +
+				" \nArrival time: " + currProcess.getArrivalTime() +
+				" \nRun time: " + currProcess.getExpectedRunTime() + "\n";
 	}
 	
 } // end of class SJF
