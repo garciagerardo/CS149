@@ -81,12 +81,10 @@ public class SRT {
      * Run the SRT algorithm and output statistics
      */
     public void run() {
-    	// current process
         Process current = null;
-        // ready: ready and waiting processes
         ready = new ArrayList<Process>();
         String processHistory = "";
-        // expected values print
+        // expected values
         for (int i = 0; i < processes.size(); i++) {
             System.out.println("Process #" + processes.get(i).getProcessNumber());
             System.out.println("Priority: " + processes.get(i).getPriority() + "\n");
@@ -94,34 +92,29 @@ public class SRT {
             System.out.println("Expected Runtime: " + processes.get(i).getExpectedRunTime());
         }
         // processing system
-        for (int t = 0; t <= 100; t++) {
-            System.out.println("Time: " + t);
-            
-            // checks for null pointer and checks if everyone's arrived
-            if (!queue.isEmpty()) { 
-            		//if current is null and process has arrived
-                if (current == null & queue.peek().getArrivalTime() <= t) {
-                	//current is the arrived from the queue list
+        for (int j = 0; j <= 100; j++) {
+            System.out.println("Run: " + j);
+            // checks for empty queue and then adds processes to queue based on burst times
+            if (!queue.isEmpty()) {
+            	// if there's currently no running processes
+                if (current == null & queue.peek().getArrivalTime() <= j) {
                     current = queue.poll();
-                    current.setStartTime(t);
-                //if current is not null check who's arrived
+                    current.setStartTime(j);
                 }
-                else if ((queue.peek().getArrivalTime() <= t)) {
-                	//checks that current is replaced and how lower burst time
+                // if there is a currently running process, but the one in the queue has a
+                // shorter burst time -- then replace it as the current
+                else if ((queue.peek().getArrivalTime() <= j)) {
                     if (current.getBurstTime() > queue.peek().getBurstTime()) {
-                        //add current to ready that is waiting
                         ready.add(current);
-                        //set current as running process
                         current = queue.poll();
-                        current.setStartTime(t);
+                        current.setStartTime(j);
                     }
-                    // if the older one has a lower burst time 
                     else if (current.getBurstTime() <= queue.peek().getBurstTime()) {
-                    		//new process added to ready that is waiting
                         ready.add(queue.poll());
                     }
                 }
             }
+            // if there is no currently running process
             if (current == null) {
                 processHistory = processHistory + "NULL ";
             }
@@ -135,8 +128,8 @@ public class SRT {
                 
                 // gather process information after it is finished (when burst time = 0)
                 if (current.getBurstTime() == 0) {
-                    this.turnaroundTime += (t + 1) - current.getArrivalTime();
-                    this.waitingTime += ((t + 1) - current.getArrivalTime()) - (current.getExpectedRunTime());               
+                    this.turnaroundTime += (j + 1) - current.getArrivalTime();
+                    this.waitingTime += ((j + 1) - current.getArrivalTime()) - (current.getExpectedRunTime());               
                     this.responseTime += current.getStartTime() - current.getArrivalTime();
                     this.completed++;
                     // if ready queue has 0, there are no current processes
@@ -148,7 +141,7 @@ public class SRT {
                     	// get process from ready queue and set start time
                         current = getProcessRQ();
                         if(current.getBurstTime() == current.getExpectedRunTime()) {
-                            current.setStartTime(t);
+                            current.setStartTime(j);
                         }
                     }
                 }
